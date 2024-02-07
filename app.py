@@ -4,6 +4,9 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token
 from flask_bcrypt import Bcrypt
+import os as os
+import argparse
+
 
 app = Flask(__name__)
 api = Api(app)
@@ -66,7 +69,8 @@ customer_schema = CustomerSchema()
 driver_schema = DriverSchema()
 customers_schema = CustomerSchema(many=True)
 drivers_schema = DriverSchema(many=True)
-
+with app.app_context():
+    db.create_all()
 
 # Authentication Resource
 class AuthResource(Resource):
@@ -311,4 +315,8 @@ api.add_resource(DriverListResource, '/drivers')
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--port', type=int, default=5000, help='Port number')
+    args = parser.parse_args()
+
+    app.run(host='0.0.0.0', debug=True, port=args.port)
